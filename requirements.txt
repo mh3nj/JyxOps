@@ -1,0 +1,4 @@
+PyQt6>=6.6.0
+PyYAML>=6.0
+xmltodict>=0.13.0
+dicttoxml>=1.7.4
