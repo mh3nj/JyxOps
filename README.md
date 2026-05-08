@@ -206,9 +206,6 @@ Because tools should be free, not walled gardens. :-)
 - Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying)
 - Email: parsegan@proton.me
 
-Special thanks to the AI coding companion who co-wrote thousands of lines and helped debug every corner of this project. <3
-
-
 ## Acknowledgements
 
 - PyQt6 team for an amazing GUI framework
