@@ -26,6 +26,34 @@ JyxOps is a desktop application that provides live, bidirectional conversion bet
 - **Settings Persistence** - Remembers font sizes, splitter positions, and last export folder
 - **Undo / Redo** - Ctrl+Z and Ctrl+Y (or Ctrl+Shift+Z) - history preserved even after conversion
 
+--- 
+
+## Learn the Formats
+
+^_^ Want to master YAML, JSON, and XML? ^_^
+
+Check out the **Learning Hub** – three in-depth tutorials based on real mistakes (including mine):
+
+- **YAML** → `LearnHub/YAML.md` (indentation, lists, dicts, anchors, multi-line strings)
+- **JSON** → `LearnHub/JSON.md` (6 simple rules, Python `json` module, exercises)
+- **XML** → `LearnHub/XML.md` (tags, attributes, CDATA, root rule, nesting)
+
+Each tutorial includes: clear rules, common mistakes, practice exercises with answers, and quick reference cards.
+
+:-D Open any file in your markdown viewer and start learning. :-)
+
+```
+JyxOps/
+├── LearnHub/
+│   ├── YAML.md
+│   ├── JSON.md
+│   └── XML.md
+├── main.py
+├── ...
+└── README.md
+```
+
+--- 
 
 ## Supported Formats
 
