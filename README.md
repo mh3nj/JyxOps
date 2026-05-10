@@ -229,10 +229,9 @@ Because tools should be free, not walled gardens. :-)
 
 **Mohsen Jafari** - Creator, Developer, Designer
 
-- GitHub: [github.com/parsegan](https://github.com/parsegan), [github.com/mh3nj](https://github.com/mh3nj)
-- LinkedIn: [linkedin.com/in/parsegan](https://linkedin.com/in/parsegan)
-- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying)
-- Email: parsegan@proton.me
+- GitHub: [mh3nj](https://github.com/mh3nj)
+- LinkedIn: [mh3nj](https://linkedin.com/in/mh3nj)
+- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying/portfolio)
 
 ## Acknowledgements
 
