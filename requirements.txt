@@ -2,3 +2,5 @@ PyQt6>=6.6.0
 PyYAML>=6.0
 xmltodict>=0.13.0
 dicttoxml>=1.7.4
+pygments>=2.0.0
+markdown>=3.4.0

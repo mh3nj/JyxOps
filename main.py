@@ -1,5 +1,6 @@
-# main.py – final mega converter without file watcher or HTML copy
+# main.py - with custom XML parser for complex structures
 import sys
+import os
 from pathlib import Path
 from datetime import datetime
 import json
@@ -9,6 +10,9 @@ from xml.dom import minidom
 import zipfile
 import tempfile
 import copy
+import re
+from html import escape
+import xml.etree.ElementTree as ET
 
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
@@ -16,8 +20,9 @@ from PyQt6.QtWidgets import (
     QToolBar, QStatusBar, QGroupBox, QComboBox
 )
 from PyQt6.QtCore import Qt, QSettings, QTimer, QMimeData
-from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QAction, QKeySequence, QGuiApplication
+from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QAction, QKeySequence, QGuiApplication, QIcon
 
+from learning_center import LearningCenterDialog
 from indented_edit import IndentedTextEdit
 from highlighter import YamlJsonHighlighter
 from find_replace_dialog import FindReplaceDialog
@@ -26,56 +31,213 @@ from settings_manager import SettingsManager
 from about_dialog import ShortcutDialog
 from batch_converter import BatchConverterDialog
 
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters import HtmlFormatter
 
-# ---------- Conversion functions (improved dict_to_xml with IDs) ----------
+# ---------- Helper function for PyInstaller resource paths ----------
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller"""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
+# ---------- Custom JSON Encoder ----------
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bytes):
+            return obj.decode('utf-8', errors='replace')
+        if isinstance(obj, (set, frozenset)):
+            return list(obj)
+        if hasattr(obj, '__dict__'):
+            return obj.__dict__
+        return super().default(obj)
+
+
+# ---------- Custom XML to Dict parser (handles complex nesting) ----------
+def custom_xml_to_dict(xml_string):
+    """Convert complex XML to dict using ElementTree."""
+    
+    def parse_element(element):
+        """Recursively parse an XML element to dict."""
+        result = {}
+        
+        # Add attributes
+        if element.attrib:
+            for attr_name, attr_value in element.attrib.items():
+                result[f"@{attr_name}"] = attr_value
+        
+        # Process children
+        children = list(element)
+        if children:
+            # Group children by tag name
+            child_dict = {}
+            for child in children:
+                child_data = parse_element(child)
+                tag = child.tag
+                
+                # Handle namespace by stripping it
+                if '}' in tag:
+                    tag = tag.split('}')[-1]
+                
+                if tag in child_dict:
+                    # Convert to list if multiple children with same tag
+                    if not isinstance(child_dict[tag], list):
+                        child_dict[tag] = [child_dict[tag]]
+                    child_dict[tag].append(child_data)
+                else:
+                    child_dict[tag] = child_data
+            
+            # Merge with result
+            for key, value in child_dict.items():
+                result[key] = value
+        
+        # Add text content
+        if element.text and element.text.strip():
+            text = element.text.strip()
+            # If there are children, text goes to '#text'
+            if children or element.attrib:
+                result['#text'] = text
+            else:
+                # No children or attributes, just return the text
+                return text
+        
+        return result if result else None
+    
+    try:
+        # Parse XML with ElementTree (more forgiving than xmltodict)
+        root = ET.fromstring(xml_string)
+        
+        # Get root tag name (strip namespace)
+        root_tag = root.tag
+        if '}' in root_tag:
+            root_tag = root_tag.split('}')[-1]
+        
+        # Parse root element
+        result = {root_tag: parse_element(root)}
+        
+        # Clean up empty values
+        def clean_empty(obj):
+            if isinstance(obj, dict):
+                return {k: clean_empty(v) for k, v in obj.items() if v is not None and v != {} and v != []}
+            elif isinstance(obj, list):
+                return [clean_empty(item) for item in obj if item is not None and item != {} and item != []]
+            return obj
+        
+        return clean_empty(result)
+        
+    except ET.ParseError as e:
+        raise Exception(f"XML parsing error: {str(e)}")
+
+
+# ---------- Conversion functions ----------
 def yaml_to_dict(s):
     return yaml.safe_load(s)
+
 
 def dict_to_yaml(d, indent=2):
     return yaml.dump(d, default_flow_style=False, indent=indent, allow_unicode=True)
 
+
 def json_to_dict(s):
     return json.loads(s)
 
+
 def dict_to_json(d, indent=2):
-    return json.dumps(d, indent=indent, ensure_ascii=False)
+    return json.dumps(d, indent=indent, ensure_ascii=False, cls=CustomJSONEncoder)
+
 
 def xml_to_dict(s):
-    return xmltodict.parse(s)
+    """Convert XML to dict using custom parser (handles complex structures)."""
+    try:
+        # First try with custom parser (handles nested structures better)
+        result = custom_xml_to_dict(s)
+        if result and isinstance(result, dict) and len(result) == 1:
+            return list(result.values())[0]
+        return result
+    except Exception as e1:
+        # Fallback to xmltodict if custom parser fails
+        try:
+            result = xmltodict.parse(s, force_cdata=True, dict_constructor=dict)
+            if isinstance(result, dict) and len(result) == 1:
+                return list(result.values())[0]
+            return result
+        except Exception as e2:
+            raise Exception(f"XML parsing failed. Custom parser error: {str(e1)}\nxmltodict error: {str(e2)}")
+
 
 def dict_to_xml(data, root_tag="root"):
-    """Convert Python dict to XML. Lists become repeated elements with id attributes."""
+    """Convert Python dict to XML."""
     def add_ids(obj, path=""):
         if isinstance(obj, list):
             for idx, item in enumerate(obj, start=1):
                 if isinstance(item, dict):
-                    item["@id"] = str(idx)
+                    if "@id" not in item:
+                        item["@id"] = str(idx)
                 else:
-                    obj[idx-1] = {"@id": str(idx), "#text": item}
+                    obj[idx-1] = {"@id": str(idx), "#text": str(item)}
             for item in obj:
                 add_ids(item, path)
         elif isinstance(obj, dict):
-            for k, v in obj.items():
-                add_ids(v, path + "/" + k)
+            for k, v in list(obj.items()):
+                if not k.startswith('@'):
+                    add_ids(v, path + "/" + k)
         return obj
-
+    
+    if data is None:
+        return f"<{root_tag}/>"
+    
     if not isinstance(data, dict):
         data = {root_tag: data}
     else:
-        data = {root_tag: data}
+        data = {root_tag: copy.deepcopy(data)}
+    
+    # Clean up None values
+    def clean_none(obj):
+        if isinstance(obj, dict):
+            return {k: clean_none(v) for k, v in obj.items() if v is not None}
+        elif isinstance(obj, list):
+            return [clean_none(item) for item in obj if item is not None]
+        return obj
+    
+    data = clean_none(data)
     processed = copy.deepcopy(data)
     add_ids(processed)
-    return xmltodict.unparse(processed, pretty=True)
+    
+    try:
+        result = xmltodict.unparse(processed, pretty=True, short_empty_elements=True)
+        if not result.startswith('<?xml'):
+            result = '<?xml version="1.0" encoding="UTF-8"?>\n' + result
+        return result
+    except Exception as e:
+        # If xmltodict fails, try a simpler approach
+        try:
+            from dicttoxml import dicttoxml
+            xml_bytes = dicttoxml.dicttoxml(data, custom_root=root_tag, attr_type=False)
+            result = xml_bytes.decode('utf-8')
+            try:
+                dom = minidom.parseString(result)
+                result = dom.toprettyxml(indent="  ")
+                result = '\n'.join([line for line in result.split('\n') if line.strip()])
+            except:
+                pass
+            return result
+        except ImportError:
+            return f"<error>Failed to convert to XML: {str(e)}</error>"
 
 
 # ---------- Main Window ----------
 class MegaConverter(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Mega Converter – YAML | JSON | XML")
+        self.setWindowTitle("JyxOps - YAML | JSON | XML Converter")
+        
+        # Set window icon (if exists)
+        icon_path = resource_path("resources/logo.ico")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        
         self.setGeometry(100, 100, 1500, 800)
 
         self.settings = SettingsManager()
@@ -106,7 +268,7 @@ class MegaConverter(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
 
         self.yaml_edit = self._create_editor("YAML", self.yaml_font_size)
-        splitter.addWidget(self.yaml_edit[0])  # groupbox
+        splitter.addWidget(self.yaml_edit[0])
         self.json_edit = self._create_editor("JSON", self.json_font_size)
         splitter.addWidget(self.json_edit[0])
         self.xml_edit = self._create_editor("XML", self.xml_font_size)
@@ -145,6 +307,11 @@ class MegaConverter(QMainWindow):
         batch_action.triggered.connect(self.open_batch_converter)
         batch_action.setShortcut(QKeySequence("Ctrl+B"))
         toolbar.addAction(batch_action)
+
+        learn_action = QAction("📚 Learning Center", self)
+        learn_action.triggered.connect(self.open_learning_center)
+        learn_action.setShortcut(QKeySequence("Ctrl+L"))
+        toolbar.addAction(learn_action)
 
         help_action = QAction("❓ Shortcuts", self)
         help_action.triggered.connect(self.show_shortcuts)
@@ -212,14 +379,18 @@ class MegaConverter(QMainWindow):
         editor = IndentedTextEdit()
         editor.setPlaceholderText(f"{title} code...")
         editor.textChanged.connect(lambda: self.on_editor_changed(title.lower()))
-        editor.set_font_size(font_size)  # apply saved size
+        editor.set_font_size(font_size)
         layout.addWidget(editor)
         copy_btn = QPushButton(f"📋 Copy {title}")
         copy_btn.clicked.connect(lambda: self.copy_to_clipboard(editor))
         layout.addWidget(copy_btn)
         return group, editor
 
-    # ---------- Drag & Drop ----------
+    def open_learning_center(self):
+        """Open the Learning Center dialog."""
+        dialog = LearningCenterDialog(self)
+        dialog.show()
+
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -242,6 +413,7 @@ class MegaConverter(QMainWindow):
         try:
             content = path.read_text(encoding="utf-8")
             suffix = path.suffix.lower()
+            
             if suffix in (".yaml", ".yml"):
                 data = yaml_to_dict(content)
             elif suffix == ".json":
@@ -253,19 +425,20 @@ class MegaConverter(QMainWindow):
             else:
                 QMessageBox.warning(self, "Unsupported", f"Cannot handle {suffix} files.")
                 return
+            
             self._set_all_texts(data)
             self.current_data = data
 
-            # Reapply font sizes after loading (ensures zoom persists)
             self.yaml_edit[1].set_font_size(self.yaml_edit[1].font_size)
             self.json_edit[1].set_font_size(self.json_edit[1].font_size)
             self.xml_edit[1].set_font_size(self.xml_edit[1].font_size)
 
             self.status_bar.showMessage(f"Loaded {path.name}", 3000)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             QMessageBox.critical(self, "Load Error", f"Failed to load file:\n{str(e)}")
 
-    # ---------- Live conversion (preserves undo) ----------
     def on_editor_changed(self, source):
         if self._updating:
             return
@@ -333,7 +506,6 @@ class MegaConverter(QMainWindow):
         self.current_data = None
         self.status_bar.showMessage("Cleared", 2000)
 
-    # ---------- Copy to clipboard ----------
     def copy_to_clipboard(self, editor):
         text = editor.toPlainText()
         if text:
@@ -342,7 +514,6 @@ class MegaConverter(QMainWindow):
         else:
             self.status_bar.showMessage("Nothing to copy", 1000)
 
-    # ---------- Pretty Print ----------
     def pretty_print_current(self):
         focus = self.focusWidget()
         if not isinstance(focus, IndentedTextEdit):
@@ -375,7 +546,6 @@ class MegaConverter(QMainWindow):
             except:
                 self.status_bar.showMessage("Invalid XML", 3000)
 
-    # ---------- Find / Replace ----------
     def show_find(self):
         focus = self.focusWidget()
         if isinstance(focus, IndentedTextEdit):
@@ -389,12 +559,10 @@ class MegaConverter(QMainWindow):
     def show_replace(self):
         self.show_find()
 
-    # ---------- Batch Conversion ----------
     def open_batch_converter(self):
         dialog = BatchConverterDialog(self)
         dialog.exec()
 
-    # ---------- Export ----------
     def export_current(self, format_type: str):
         if self.current_data is None:
             QMessageBox.information(self, "No Data", "Nothing to export.")
@@ -449,7 +617,6 @@ class MegaConverter(QMainWindow):
             (export_dir / "data.xml").write_text(dict_to_xml(self.current_data), encoding="utf-8")
             self.status_bar.showMessage(f"Exported to folder {export_dir}", 5000)
 
-    # ---------- Undo/Redo ----------
     def undo(self):
         focus = self.focusWidget()
         if isinstance(focus, IndentedTextEdit):
@@ -475,16 +642,13 @@ class MegaConverter(QMainWindow):
     def clear_all(self):
         self._clear_all_editors()
 
-    # ---------- Default format ----------
     def on_default_format_changed(self, fmt):
         self.settings.set_default_format(fmt.lower())
 
-    # ---------- Help ----------
     def show_shortcuts(self):
         dialog = ShortcutDialog(self)
         dialog.exec()
 
-    # ---------- Save settings on close ----------
     def closeEvent(self, event):
         self.settings.set_font_size("yaml", self.yaml_edit[1].font_size)
         self.settings.set_font_size("json", self.json_edit[1].font_size)
@@ -495,12 +659,24 @@ class MegaConverter(QMainWindow):
         event.accept()
 
 
+# ---------- Main function ----------
 def main():
+    # Suppress Qt font warnings
+    os.environ["QT_LOGGING_RULES"] = "qt.text.font.db=false"
+    
     app = QApplication(sys.argv)
+    
+    # Set Windows taskbar icon (Windows only)
+    if sys.platform == 'win32':
+        import ctypes
+        myappid = 'jyxops.converter.v2.0'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    
     app.setStyle("Fusion")
     window = MegaConverter()
     window.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

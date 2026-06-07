@@ -1,255 +1,256 @@
+# JyxOps v2.0
 
-# JyxOps - Universal Data Format Converter
+![Version](https://img.shields.io/badge/version-2.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.11+-yellow)
+![Platform](https://img.shields.io/badge/platform-windows%20%7C%20mac%20%7C%20linux-lightgrey)
+![Offline](https://img.shields.io/badge/works-offline-brightgreen)
+![Built in Iran](https://img.shields.io/badge/built%20in-iran-orange)
 
-^_^ Convert between YAML, JSON, and XML with zero hassle. ^_^
+> **YAML to JSON to XML converter. Three formats. One interface. Zero complexity.**
 
-JyxOps is a desktop application that provides live, bidirectional conversion between three major data formats. Built for DevOps engineers, developers, and system administrators who regularly work with configuration files, API responses, and infrastructure definitions.
+Convert between YAML, JSON, and XML in real time. Edit one format, watch the others update instantly. No cloud. No tracking. No subscription. Just a tool that does exactly what you need.
 
-:-) No more manual reformatting. No more syntax guesswork. Just drag, drop, and convert. :-)
+<img src="/assets/banner.png" alt="JyxOps Banner" width="100%">
 
+---
+
+## What problem does this solve?
+
+Every developer has been there. You have a YAML config file but the API expects JSON. You have XML data but your script needs YAML. You spend minutes manually converting formats, dealing with syntax differences, fixing indentation errors.
+
+JyxOps solves this by giving you three editors in one window. Type in YAML, get JSON and XML automatically. Paste XML, get YAML and JSON immediately. The conversion happens as you type. No buttons to click. No waiting. No syntax errors to debug.
+
+Built because existing converters were either online only, required uploading sensitive data, or had clunky interfaces that made the process slower than just doing it manually.
+
+---
+
+## What makes this different?
+
+**Real time conversion.** Change a value in YAML and the JSON and XML panels update immediately. No refresh button. No delay. Just instant feedback.
+
+**Works offline completely.** Your data never leaves your computer. There is no cloud component. There is no telemetry. The converter runs entirely locally.
+
+**Three formats, one interface.** YAML on the left, JSON in the middle, XML on the right. Everything visible at once. No switching between tabs or windows.
+
+**Learning center built in.** Not sure about YAML syntax? Open the learning center with Ctrl+L. Tutorials for all three formats are included, with examples and common mistakes explained.
+
+**Dark theme by default.** Your eyes will thank you during late night coding sessions.
+
+---
 
 ## Features
 
-:-D
+| Category | What is inside |
+|----------|----------------|
+| Core conversion | YAML to JSON, YAML to XML, JSON to YAML, JSON to XML, XML to YAML, XML to JSON. All conversions happen in real time. |
+| Three editors | Each format has its own editor with syntax highlighting, line numbers, zoom in/out with Ctrl+mouse wheel, and horizontal scroll with Shift+mouse wheel. |
+| File operations | Open YAML, JSON, or XML files. Export any format individually. Export all three formats at once as separate files or as a ZIP archive. |
+| Pretty print | Clean up messy formatting with Ctrl+Shift+F. Works for all three formats. |
+| Find and replace | Search within any editor. Replace text. Replace all occurrences. Supports case sensitivity and whole word matching. |
+| Batch conversion | Convert entire folders from one format to another. Useful for migrating large collections of files. |
+| Learning center | Separate window with tutorials for YAML, JSON, and XML. Access with Ctrl+L. Includes syntax guides, common mistakes, and practice exercises. |
+| Undo and Redo | Standard Ctrl+Z and Ctrl+Y shortcuts work in all editors. |
+| Copy to clipboard | One button copy for each format's content. |
+| Drag and drop | Drop any YAML, JSON, or XML file onto the application to load it. |
+| Persistent settings | Your font sizes, splitter positions, and default format preference are saved between sessions. |
 
-- **Live Conversion** - Edit in any panel (YAML, JSON, or XML), the other two update instantly
-- **Dark Theme Only** - Designed for comfortable long sessions at the terminal (no eye strain)
-- **Line Numbers** - Every editor shows line numbers for easy navigation and debugging
-- **Zoom In/Out** - Ctrl + Mouse Wheel to adjust font size (per-panel memory preserved)
-- **Horizontal Scroll** - Shift + Mouse Wheel for long lines that wrap beyond screen width
-- **Find / Replace** - Ctrl+F and Ctrl+H with case-sensitive, whole word, and regex options
-- **Pretty Print** - Ctrl+Shift+F to auto-format messy code in the current panel
-- **Batch Conversion** - Convert entire folders from one format to another with progress bar
-- **Drag & Drop** - Drop any .yaml, .yml, .json, or .xml file directly onto the window
-- **Export Individual** - Save current data as YAML, JSON, or XML separately
-- **Export All** - Create timestamped folder OR single ZIP archive with all three formats
-- **Settings Persistence** - Remembers font sizes, splitter positions, and last export folder
-- **Undo / Redo** - Ctrl+Z and Ctrl+Y (or Ctrl+Shift+Z) - history preserved even after conversion
+---
 
---- 
+## Screenshots
 
-## Learn the Formats
+<table>
+    <tr>
+        <td><img src="screenshots/1.png" alt="main window">main window</td>
+        <td><img src="screenshots/2.png" alt="main window prettirt used">main window prettirt used</td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/3.png" alt="shortcuts and help">shortcuts and help</td>
+        <td><img src="screenshots/4.png" alt="learning center yaml">learning center yaml</td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/5.png" alt="learning center json">learning center json</td>
+        <td><img src="screenshots/6.png" alt="learning center xml">learning center xml</td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/7.png" alt="batch converter folder">batch converter folder</td>
+        <td><img src="screenshots/8.png" alt="find and replace">find and replace</td>
+    </tr>
+</table>
 
-^_^ Want to master YAML, JSON, and XML? ^_^
+---
 
-Check out the **Learning Hub** – three in-depth tutorials based on real mistakes (including mine):
+## Getting Started
 
-- **YAML** → `LearnHub/YAML.md` (indentation, lists, dicts, anchors, multi-line strings)
-- **JSON** → `LearnHub/JSON.md` (6 simple rules, Python `json` module, exercises)
-- **XML** → `LearnHub/XML.md` (tags, attributes, CDATA, root rule, nesting)
+### Windows
 
-Each tutorial includes: clear rules, common mistakes, practice exercises with answers, and quick reference cards.
+Download `setup_and_run.bat` and double click it.
 
-:-D Open any file in your markdown viewer and start learning. :-)
+The script will check your Python version, create a virtual environment, install dependencies, and launch JyxOps. If something is missing, it tells you exactly what and where to get it.
 
 ```
-JyxOps/
-├── LearnHub/
-│   ├── YAML.md
-│   ├── JSON.md
-│   └── XML.md
-├── main.py
-├── ...
-└── README.md
+setup_and_run.bat
 ```
 
---- 
+If Windows Defender flags it, click "more info" then "run anyway". The script is readable. You can inspect every line before running.
 
-## Supported Formats
+### Mac / Linux
 
-:-O
-
-| Format | Extension(s) | Direction | Notes                                      |
-|--------|--------------|-----------|--------------------------------------------|
-| YAML   | .yaml, .yml  | Read/Write | Standard YAML 1.2, no custom tags         |
-| JSON   | .json        | Read/Write | Strict JSON, double quotes, no comments   |
-| XML    | .xml         | Read/Write | Repeated sibling elements get id="1", id="2" attributes |
-
-
-## Installation
-
->"<
-
-### From Source
+Download `setup_and_run.sh`, make it executable, and run it.
 
 ```bash
-git clone https://github.com/parsegan/JyxOps.git
-cd JyxOps
+chmod +x setup_and_run.sh
+./setup_and_run.sh
+```
+
+Same as the Windows version. It checks Python, sets up the environment, installs dependencies, and launches JyxOps.
+
+### Manual setup
+
+```bash
+git clone https://github.com/mh3nj/jyxops.git
+cd jyxops
+python -m venv .venv
+
+# Windows:
+.venv\Scripts\activate
+# Mac/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 python main.py
 ```
 
-## Requirements
+### Requirements
 
-^_^
+- Python 3.11 or higher
+- 500 MB RAM is plenty
+- Works fully offline after installation
+- Internet only needed for installing dependencies
 
-- Python 3.10 or higher (for source installation)
-- PyQt6
-- PyYAML
-- xmltodict
-- dicttoxml
+---
 
-All dependencies are listed in `requirements.txt`.
+## First Run
 
+When you launch JyxOps for the first time, you will see three empty editors. You can either:
 
-## Usage
+1. Drag and drop a YAML, JSON, or XML file onto the drop area
+2. Click the Open button in the toolbar
+3. Start typing directly into any editor
 
-<3
+The other two editors will populate automatically as you type. If you make a syntax error, the editor border turns red and the error message appears in the status bar.
 
-### Basic Workflow
+Press Ctrl+L to open the Learning Center. It contains complete tutorials for all three formats with examples you can copy and paste directly into the editors.
 
-1. Launch JyxOps
-2. Drag a YAML, JSON, or XML file onto the drop area (or use File > Open)
-3. Edit any panel - the other two panels update automatically
-4. Export individual formats or use Export All for a complete package
+---
 
-### Keyboard Shortcuts
+## Keyboard Shortcuts
 
-:-P
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+O | Open a file |
+| Ctrl+S | Export current format |
+| Ctrl+Shift+S | Export all formats (ZIP or folder) |
+| Ctrl+Z | Undo |
+| Ctrl+Y or Ctrl+Shift+Z | Redo |
+| Ctrl+F | Find text |
+| Ctrl+H | Replace text |
+| Ctrl+Shift+F | Pretty print current editor |
+| Ctrl+B | Batch convert folder |
+| Ctrl+L | Open Learning Center |
+| Ctrl+? | Show shortcuts dialog |
+| Ctrl+mouse wheel | Zoom in/out |
+| Shift+mouse wheel | Horizontal scroll |
 
-| Action               | Shortcut                          |
-|----------------------|-----------------------------------|
-| Open file            | Ctrl+O                            |
-| Export YAML          | Ctrl+Shift+Y or toolbar button    |
-| Export JSON          | Ctrl+Shift+J or toolbar button    |
-| Export XML           | Ctrl+Shift+X or toolbar button    |
-| Export All (ZIP)     | Ctrl+Shift+E or toolbar button    |
-| Pretty Print         | Ctrl+Shift+F                      |
-| Find                 | Ctrl+F                            |
-| Replace              | Ctrl+H                            |
-| Undo                 | Ctrl+Z                            |
-| Redo                 | Ctrl+Y or Ctrl+Shift+Z            |
-| Zoom In              | Ctrl+Mouse Wheel Up               |
-| Zoom Out             | Ctrl+Mouse Wheel Down             |
-| Horizontal Scroll    | Shift+Mouse Wheel                 |
-| Clear All            | Toolbar button or menu            |
-
-### Batch Conversion
-
-1. Click the "Batch Convert" button in the toolbar (or press Ctrl+B)
-2. Select input folder (contains source files)
-3. Select output folder (destination for converted files)
-4. Choose input format (YAML, JSON, or XML)
-5. Choose output format (YAML, JSON, or XML)
-6. Click "Convert" - progress bar shows status
-
-### Export All
-
-Two export modes are available:
-
-1. **ZIP Archive** - Creates a single compressed file containing data.yaml, data.json, and data.xml
-2. **Timestamped Folder** - Creates a folder named export_YYYYMMDD_HHMMSS with all three files
-
-Choose your preferred mode when prompted after clicking Export All.
-
-
-## Screenshots
-
-^_-
-
-Screenshots will be added to the `/screenshots` folder in the repository.
-
-- Main window with three panels (dark theme)
-- Batch conversion dialog with progress
-- Find/Replace dialog (regex mode)
-- Export All ZIP file creation
-
+---
 
 ## Project Structure
 
 ```
-JyxOps/
-├── main.py                 # Entry point, main window logic
-├── converters.py           # YAML/JSON/XML conversion functions
-├── indented_edit.py        # Custom text editor with line numbers and zoom
-├── highlighter.py          # Syntax highlighting (Dracula theme)
-├── find_replace_dialog.py  # Find/Replace dialog
-├── batch_converter.py      # Batch conversion dialog and worker thread
-├── settings_manager.py     # Persistent settings (QSettings wrapper)
-├── about_dialog.py         # Shortcut cheat sheet
-├── themes.py               # Dark theme CSS
-├── requirements.txt        # Python dependencies
-├── README.md               # This file
-└── screenshots/            # Application screenshots (to be added)
+jyxops/
+├── main.py                      # Application entry point
+├── learning_center.py           # Tutorial window
+├── indented_edit.py             # Editor widget with line numbers
+├── highlighter.py               # Syntax highlighting
+├── find_replace_dialog.py       # Find and replace UI
+├── themes.py                    # Dark theme styling
+├── settings_manager.py          # Persistent settings
+├── about_dialog.py              # Shortcuts help dialog
+├── batch_converter.py           # Batch conversion
+├── requirements.txt             # Dependencies
+├── setup_and_run.bat            # Windows launcher
+├── setup_and_run.sh             # Mac/Linux launcher
+├── resources/
+│   ├── logo.png                 # Application logo
+│   └── favicon/
+│       └── favicon.ico          # Window icon
+├── LearnHub/
+│   ├── yaml.md                  # YAML tutorial
+│   ├── json.md                  # JSON tutorial
+│   └── xml.md                   # XML tutorial
+└── screenshots/
+    └── (images for readme)
 ```
 
+---
 
-## Development
+## Dependencies
 
-:-(
+```
+PyQt6>=6.6.0         # GUI framework
+PyYAML>=6.0          # YAML parsing
+xmltodict>=0.13.0    # XML to dict conversion
+dicttoxml>=1.7.4     # Dict to XML conversion
+pygments>=2.0.0      # Syntax highlighting for tutorials
+markdown>=3.4.0      # Markdown to HTML for tutorials
+```
 
-**Timeline:** Single day development (May 2, 2026) - approximately 5 hours of intensive coding.
+No internet connection is required after installation. All conversions happen locally.
 
-**Status:** Complete, stable, ready for production use.
-
-**Tested on:** Windows 11, Ubuntu 22.04 (planned), macOS (planned)
-
+---
 
 ## Known Limitations
 
-:-O
+- Very large files (over 100 MB) may cause slow performance due to real time conversion
+- XML with complex namespaces may lose namespace prefixes during conversion
+- YAML anchors and aliases are resolved during conversion; they do not persist in the output
+- The Learning Center tutorials are Markdown files; they can be edited or replaced with your own content
 
-- No light theme (dark theme only - intentional for DevOps workflow)
-- XML conversion wraps data in a default root tag if no root exists
-- No file watcher (auto-reload on external changes)
-- No Copy as HTML functionality
-
-
-## Roadmap (Future Versions)
-
-^_^ <3
-
-- Light theme toggle (re-enable after initial removal)
-- File watcher with polling fallback
-- Copy as HTML with Pygments syntax highlighting
-- TOML format support
-- Command-line interface (batch without GUI)
-- Docker containerization
-
-
-## Contributing
-
-:-P
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please ensure tests pass before submitting (tests to be added in v1.1).
-
-
-## License
-
-^_-
-
-MIT License - Free for personal and commercial use with attribution.
-
-Because tools should be free, not walled gardens. :-)
-
-
-## Author
-
-**Mohsen Jafari** - Creator, Developer, Designer
-
-- GitHub: [mh3nj](https://github.com/mh3nj)
-- LinkedIn: [mh3nj](https://linkedin.com/in/mh3nj)
-- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying/portfolio)
-
-## Acknowledgements
-
-- PyQt6 team for an amazing GUI framework
-- PyYAML, xmltodict, and dicttoxml developers
-- The DevOps community who suffer daily with YAML indentation
-- Internet restrictions in Iran - you made me build things offline :-P
-
+---
 
 ## Development Context
 
-This project was completed during internet restrictions in Iran. All code was written offline without access to package repositories, documentation, or online resources. The application was developed entirely using local knowledge, memory, and AI assistance that was available before restrictions intensified.
+This project was built under internet restrictions in Iran, where access to GitHub, PyPI, Stack Overflow, and most development resources was blocked during extended periods. Dependencies were researched and downloaded during brief connectivity windows. Documentation was consulted from locally cached copies.
 
-:-) Proof of genuine software development activity is available through local Git commit history and file creation timestamps. :-)
+The application was built anyway. It works. It is documented. It can be cloned and run by anyone.
 
+---
 
-## Support
+## About the Author
 
-For issues, questions, or feature requests, please open a GitHub issue. Responses may be delayed due to connectivity constraints, but all inquiries will be addressed.
+**Mohsen Jafari** is a full time web developer based in Iran, with experience in frontend development, backend systems, and desktop applications.
 
-:-D
+JyxOps was built to solve a real need: a converter that does not require uploading sensitive data to someone else's server, does not have a subscription fee, and works entirely offline.
+
+- github: [github.com/mh3nj](https://github.com/mh3nj)
+- xing: [xing.com/profile/Mohsen_Jafari093223](https://www.xing.com/profile/Mohsen_Jafari093223/)
+- logo design: [parsegan.com](https://parsegan.com)
+- portfolio: [dahgan.com](https://dahgan.com)
+
+---
+
+## License
+
+MIT. Use it, fork it, modify it, ship it. Attribution is appreciated but not required.
+
+---
+
+## The Story Behind This
+
+This project was built during a period when the internet in Iran was heavily restricted. No Stack Overflow. No PyPI. No GitHub. No YouTube tutorials. No reliable connection to the tools most developers take for granted. Just whatever was cached locally, whatever could be reasoned through from first principles, and the determination to ship something real.
+
+It works. It is useful. It was built under conditions that would have stopped most projects before they started.
+
+**JyxOps. YAML. JSON. XML. One tool. Your machine. Your control.**
+
+— mh3nj
